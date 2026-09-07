@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    environment:
+      - TELEMETRY_FILE=/app/shared_state/telemetry.json
+    volumes:
+      - ./data:/app/data
+      - ./crater_db:/app/crater_db
+      - telemetry_bridge:/app/shared_state
+
+  simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    command: ["python", "simulation/main.py"]
+    environment:
+      - TELEMETRY_FILE=/app/shared_state/telemetry.json
+    volumes:
+      - ./data:/app/data
+      - ./crater_db:/app/crater_db
+      - telemetry_bridge:/app/shared_state
+    depends_on:
+      - backend
+
+  frontend:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+      args:
+        VITE_WS_URL: ws://localhost:8000/ws
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  telemetry_bridge:

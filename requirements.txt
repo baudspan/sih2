@@ -1,0 +1,8 @@
+numpy
+scipy
+pandas
+rasterio
+opencv-python-headless
+fastapi
+uvicorn[standard]
+websockets
